@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>心理諮商 AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        #chat-header {
+            background-color: #00c300;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #chat-header img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        #chat-container {
+            width: 95%;
+            height: 450px;
+            margin: 60px auto 20px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin: 10px 0;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message.ai {
+            justify-content: flex-start;
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .message.user .message-content {
+            background-color: #00c300;
+            color: white;
+        }
+        .message.ai .message-content {
+            background-color: #e9ecef;
+            color: black;
+        }
+        .message.ai img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #888;
+            margin: 0 5px;
+            align-self: flex-end;
+        }
+        #input-container {
+            width: 400px;
+            margin: 0 auto;
+            display: flex;
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+        }
+        #send-button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #00c300;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #00a300;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-header">
+        <span>心靈曙光守護者 (Dawn Keeper of the Mind)</span>
+    </div>
+    <div id="chat-container"></div>
+    <div id="input-container">
+        <input type="text" id="user-input" placeholder="輸入你的訊息...">
+        <button id="send-button" onclick="sendMessage()">送出</button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const API_KEY = 'AIzaSyC4Q2Y-2WBscfI2JBLLdbd_5iEsvm-JAFs';
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        const SYSTEM_PROMPT = "系統提示：你是一位專業且有耐心的心理諮商師，專注於提供心理治療支持。你的語氣溫暖、同理心強，並會積極傾聽用戶的問題，給予具體且實用的建議。請根據以下用戶輸入進行回應。\n用戶輸入：";
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user' : 'ai');
+
+            const timestamp = document.createElement('span');
+            timestamp.classList.add('timestamp');
+            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('message-content');
+            contentDiv.textContent = text;
+
+            if (!isUser) {
+                const avatar = document.createElement('img');
+                avatar.src = 'https://cdn4.iconfinder.com/data/icons/medical-staff-characters-1/128/doctor_avatar_female_glasses_therapist_psychiatrist_specialist-512.png';
+                avatar.alt = '心理諮商師';
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(timestamp);
+            } else {
+                messageDiv.appendChild(timestamp);
+                messageDiv.appendChild(contentDiv);
+            }
+
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            userInput.value = '';
+
+            const payload = {
+                "contents": [{
+                    "parts": [{
+                        "text": `${SYSTEM_PROMPT}${message}`
+                    }]
+                }]
+            };
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                addMessage(aiResponse, false);
+            } catch (error) {
+                addMessage("抱歉，發生錯誤，請稍後再試。", false);
+                console.error(error);
+            }
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
