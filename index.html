@@ -2,7 +2,10 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>心理諮商 AI</title>
+    <title>Dawn Keeper of the Mind</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +21,9 @@
             position: fixed;
             width: 100%;
             top: 0;
+												  
             display: flex;
+										   
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -109,6 +114,9 @@
 <body>
     <div id="chat-header">
         <span>心靈曙光守護者 (Dawn Keeper of the Mind)</span>
+									 
+			  
+																   
     </div>
     <div id="chat-container"></div>
     <div id="input-container">
@@ -121,7 +129,10 @@
         const userInput = document.getElementById('user-input');
         const API_KEY = 'AIzaSyA9OEx3T2q0ahU88aPyTE8ebquRm2FSxvg';
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-        const SYSTEM_PROMPT = "系統提示：你是一位專業且有耐心的心理諮商師，專注於提供心理治療支持。你的語氣溫暖、同理心強，並會積極傾聽用戶的問題，給予具體且實用的建議。請根據以下用戶輸入進行回應。\n用戶輸入：";
+		const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間，根據用戶輸入提供具體建議。\n用戶輸入：";
+
+        // 儲存對話歷史的陣列
+        let conversationHistory = [];
 
         function addMessage(text, isUser) {
             const messageDiv = document.createElement('div');
@@ -150,6 +161,9 @@
 
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // 更新對話歷史
+            conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
         }
 
         async function sendMessage() {
@@ -159,25 +173,34 @@
             addMessage(message, true);
             userInput.value = '';
 
+            // 構建完整的對話歷史字串
+            let fullPrompt = SYSTEM_PROMPT;
+            conversationHistory.forEach(entry => {
+                fullPrompt += `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}\n`;
+            });
+            fullPrompt += `Latest User Input: ${message}\nAssistant:`;
+
             const payload = {
                 "contents": [{
                     "parts": [{
-                        "text": `${SYSTEM_PROMPT}${message}`
+                        "text": fullPrompt
                     }]
                 }]
             };
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 addMessage(aiResponse, false);
             } catch (error) {
                 addMessage("抱歉，發生錯誤，請稍後再試。", false);
-                console.error(error);
+                console.error("Error:", error);
             }
         }
 
