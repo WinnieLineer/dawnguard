@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 手機視口 -->
     <title>Dawn Keeper of the Mind</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -12,6 +13,7 @@
             background-color: #f0f0f0;
             margin: 0;
             padding: 0;
+            overflow-x: hidden; /* 防止水平滾動 */
         }
         #chat-header {
             background-color: #00c300;
@@ -21,12 +23,11 @@
             position: fixed;
             width: 100%;
             top: 0;
-												  
             display: flex;
-										   
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* 確保標頭在最上層 */
         }
         #chat-header img {
             width: 30px;
@@ -36,8 +37,9 @@
         }
         #chat-container {
             width: 95%;
-            height: 450px;
-            margin: 60px auto 20px;
+            max-width: 800px; /* 限制最大寬度 */
+            height: calc(100vh - 120px); /* 動態高度適配螢幕 */
+            margin: 60px auto 60px; /* 底部留空間給輸入框 */
             overflow-y: auto;
             padding: 10px;
             background-color: #ffffff;
@@ -60,6 +62,7 @@
             padding: 10px;
             border-radius: 15px;
             position: relative;
+            font-size: 16px; /* 確保文字可讀 */
         }
         .message.user .message-content {
             background-color: #00c300;
@@ -82,41 +85,77 @@
             align-self: flex-end;
         }
         #input-container {
-            width: 400px;
+            width: 95%;
+            max-width: 800px; /* 與聊天容器一致 */
             margin: 0 auto;
             display: flex;
             position: fixed;
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
+            padding: 0 10px; /* 左右留邊距 */
+            box-sizing: border-box;
         }
         #user-input {
             flex-grow: 1;
-            padding: 10px;
+            padding: 12px; /* 增大觸控區域 */
             border: 1px solid #ccc;
             border-radius: 20px;
             outline: none;
+            font-size: 16px; /* 手機上文字清晰 */
         }
         #send-button {
-            padding: 10px 20px;
+            padding: 12px 24px; /* 增大按鈕 */
             margin-left: 10px;
             background-color: #00c300;
             color: white;
             border: none;
             border-radius: 20px;
             cursor: pointer;
+            font-size: 16px;
         }
         #send-button:hover {
             background-color: #00a300;
+        }
+
+        /* 媒體查詢：手機螢幕（寬度小於 600px） */
+        @media (max-width: 600px) {
+            #chat-container {
+                width: 100%;
+                margin: 50px 0 60px; /* 減少頂部間距 */
+                border-radius: 0; /* 手機上滿版 */
+                box-shadow: none; /* 簡化陰影 */
+                height: calc(100vh - 110px);
+            }
+            #input-container {
+                width: 100%;
+                padding: 0 5px;
+            }
+            #user-input {
+                padding: 10px;
+                font-size: 14px; /* 稍小但可讀 */
+            }
+            #send-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            .message-content {
+                max-width: 80%; /* 手機上增加寬度 */
+                font-size: 14px;
+            }
+            .message.ai img {
+                width: 30px; /* 頭像稍小 */
+                height: 30px;
+            }
+            .timestamp {
+                font-size: 10px; /* 時間戳記縮小 */
+            }
         }
     </style>
 </head>
 <body>
     <div id="chat-header">
         <span>心靈曙光守護者 (Dawn Keeper of the Mind)</span>
-									 
-			  
-																   
     </div>
     <div id="chat-container"></div>
     <div id="input-container">
@@ -129,9 +168,8 @@
         const userInput = document.getElementById('user-input');
         const API_KEY = 'AIzaSyA9OEx3T2q0ahU88aPyTE8ebquRm2FSxvg';
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-		const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間，根據用戶輸入提供具體建議。\n用戶輸入：";
+        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間，根據用戶輸入提供具體建議。\n用戶輸入：";
 
-        // 儲存對話歷史的陣列
         let conversationHistory = [];
 
         function addMessage(text, isUser) {
@@ -162,7 +200,6 @@
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            // 更新對話歷史
             conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
         }
 
@@ -173,7 +210,6 @@
             addMessage(message, true);
             userInput.value = '';
 
-            // 構建完整的對話歷史字串
             let fullPrompt = SYSTEM_PROMPT;
             conversationHistory.forEach(entry => {
                 fullPrompt += `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}\n`;
@@ -187,7 +223,6 @@
                     }]
                 }]
             };
-
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
