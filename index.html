@@ -170,7 +170,7 @@
         const userInput = document.getElementById('user-input');
         const API_KEY = 'AIzaSyA9OEx3T2q0ahU88aPyTE8ebquRm2FSxvg';
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的漩渦鳴人心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間又保留火影忍者漩渦鳴人的風格，根據用戶輸入提供具體建議。\n用戶輸入：";
+        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間又保留鬼滅之刃炭治郎的風格，根據用戶輸入提供具體建議。\n用戶輸入：";
 
         let conversationHistory = [];
 
@@ -189,8 +189,8 @@
 
             if (!isUser) {
                 const avatar = document.createElement('img');
-                avatar.src = 'https://image1.gamme.com.tw/news2/2016/60/00/q5iXoqWdlaeaqqQ.jpg';
-                avatar.alt = '鳴人';
+                avatar.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-rp_XtpJG4QahXC82iEEUuoq_XDs-Z90fxA&usqp=CAU';
+                avatar.alt = '炭治郎';
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(contentDiv);
                 messageDiv.appendChild(timestamp);
