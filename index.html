@@ -1,238 +1,409 @@
-e<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- 禁用縮放 -->
-    <title>Dawn Keeper of the Mind</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dawn Keeper of the Mind - 竈門炭治郎</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --tanjiro-green: #207244;
+            --tanjiro-black: #0f1110;
+            --water-blue: #00a8cc;
+            --water-light: #8cb6d6;
+            --paper-bg: #f3f0e6;
+            --text-color: #2c2c2c;
+            --accent-red: #b22222;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+            background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            background-image: url('https://www.transparenttextures.com/patterns/black-scales.png'); /* 類似鬼滅隊服或鱗片紋理 */
-        }
-        #chat-header {
-            background-color: #00c300;
-            color: white;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            top: 0;
+            color: var(--text-color);
             display: flex;
-            align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 1000;
+            height: 100vh;
         }
-        #chat-header img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-right: 10px;
+
+        /* 背景紋理 Asanoha (麻葉紋) Overlay */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+            background-image: 
+                linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(60deg, #77777777 25%, transparent 25.5%, transparent 75%, #77777777 75%, #77777777),
+                linear-gradient(60deg, #77777777 25%, transparent 25.5%, transparent 75%, #77777777 75%, #77777777);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
         }
+
+        #main-container {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            background-color: var(--paper-bg);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            border-left: 10px solid var(--tanjiro-black);
+            border-right: 10px solid var(--tanjiro-black);
+            position: relative;
+        }
+
+        /* 頂部裝飾 - 市松紋 (Ichimatsu) */
+        .ichimatsu-header {
+            height: 60px;
+            width: 100%;
+            background-color: var(--tanjiro-green);
+            background-image: 
+                linear-gradient(45deg, var(--tanjiro-black) 25%, transparent 25%, transparent 75%, var(--tanjiro-black) 75%, var(--tanjiro-black)),
+                linear-gradient(45deg, var(--tanjiro-black) 25%, transparent 25%, transparent 75%, var(--tanjiro-black) 75%, var(--tanjiro-black));
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+            position: relative;
+        }
+
+        .header-title-box {
+            background-color: var(--paper-bg);
+            padding: 5px 20px;
+            border: 2px solid var(--tanjiro-black);
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            writing-mode: horizontal-tb; /* 可改 vertical-rl 更有味道 */
+        }
+
         #chat-container {
-            width: 95%;
-            max-width: 800px;
-            height: calc(100vh - 120px); /* 預留輸入框和標頭空間 */
-            margin: 60px auto 60px;
+            flex-grow: 1;
             overflow-y: auto;
-            padding: 10px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            box-sizing: border-box;
+            padding: 20px;
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
         }
+
+        /* 卷軸樣式滾動條 */
+        #chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-container::-webkit-scrollbar-track {
+            background: #e0dccc;
+        }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: var(--tanjiro-black);
+            border-radius: 4px;
+        }
+
         .message {
             display: flex;
-            align-items: flex-start;
-            margin: 10px 0;
-        }
-        .message.user {
-            justify-content: flex-end;
-        }
-        .message.ai {
-            justify-content: flex-start;
-        }
-        .message-content {
-            max-width: 70%;
-            padding: 10px;
-            border-radius: 15px;
+            align-items: flex-end;
+            max-width: 85%;
             position: relative;
-            font-size: 16px;
+            animation: fadeIn 0.5s ease-out;
         }
-        .message.user .message-content {
-            background-color: #00c300;
-            color: white;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .message.ai .message-content {
-            background-color: #e9ecef;
-            color: black;
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
         }
-        .message.ai img {
-            width: 40px;
-            height: 40px;
+
+        .message.ai {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            margin-right: 10px;
+            border: 2px solid var(--tanjiro-black);
+            overflow: hidden;
+            margin: 0 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            background-color: white;
+            flex-shrink: 0;
         }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user .avatar { display: none; } /* 用戶不顯示頭像，保持簡潔 */
+
+        .message-content {
+            padding: 12px 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* 墨跡邊框風格 */
+        .message.ai .message-content {
+            background-color: white;
+            border-radius: 4px 20px 20px 20px;
+            border-left: 4px solid var(--tanjiro-green);
+        }
+
+        .message.user .message-content {
+            background-color: var(--tanjiro-black);
+            color: #f0f0f0;
+            border-radius: 20px 4px 20px 20px;
+            border-right: 4px solid var(--water-blue);
+        }
+
         .timestamp {
-            font-size: 12px;
+            font-size: 10px;
             color: #888;
             margin: 0 5px;
-            align-self: flex-end;
-        }
-        #input-container {
-            width: 95%;
-            max-width: 800px;
-            display: flex;
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0 10px;
-            box-sizing: border-box;
-            background-color: #f0f0f0; /* 避免鍵盤遮蓋時突兀 */
-            z-index: 1000;
-        }
-        #user-input {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            outline: none;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        #send-button {
-            padding: 12px 24px;
-            margin-left: 10px;
-            background-color: #00c300;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        #send-button:hover {
-            background-color: #00a300;
-        }
-
-        /* 手機螢幕優化 */
-        @media (max-width: 600px) {
-            #chat-container {
-                width: 100%;
-                margin: 50px 0 70px; /* 增加底部空間給輸入框 */
-                border-radius: 0;
-                box-shadow: none;
-                height: calc(100vh - 110px); /* 適配鍵盤彈出 */
-            }
-            #input-container {
-                width: 100%;
-                padding: 0 5px;
-            }
-            #user-input {
-                padding: 10px;
-                font-size: 14px;
-            }
-            #send-button {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-            .message-content {
-                max-width: 80%;
-                font-size: 14px;
-            }
-            .message.ai img {
-                width: 30px;
-                height: 30px;
-            }
-            .timestamp {
-                font-size: 10px;
-            }
-        }
-
-        
-        /* Loading Animation - Water Breathing / Tanjiro Pattern */
-        #loading-indicator {
-            display: none;
-            justify-content: flex-start;
-            margin: 10px 0;
-            padding-left: 10px;
-        }
-        
-        .breathing-loader {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .breathing-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #00c300; /* Tanjiro Green */
-            border-radius: 50%;
-            animation: water-breath 1.5s infinite ease-in-out;
-        }
-        
-        .breathing-dot:nth-child(1) { animation-delay: 0s; background-color: #202020; /* Black */ }
-        .breathing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .breathing-dot:nth-child(3) { animation-delay: 0.4s; background-color: #202020; }
-        
-        @keyframes water-breath {
-            0%, 100% { transform: scale(0.5); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 1; }
+            margin-bottom: 5px;
         }
 
         .date-separator {
             text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin: 15px 0;
+            font-size: 13px;
+            color: #555;
+            margin: 20px 0;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
+        .date-separator::before, .date-separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #ccc;
+            margin: 0 15px;
+        }
+
         .date-separator span {
-            background-color: #f0f0f0;
-            padding: 0 10px;
+            background-color: rgba(255,255,255,0.7);
+            padding: 2px 10px;
             border-radius: 10px;
+            font-family: 'Shippori Mincho', serif;
+            letter-spacing: 1px;
+        }
+
+        /* Input Area with Wood Texture/Ukiyo-e feel */
+        #input-container {
+            padding: 15px;
+            background-color: #f8f6f0;
+            border-top: 2px solid var(--tanjiro-black);
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+
+        #user-input:focus {
+            border-color: var(--tanjiro-green);
+        }
+
+        #send-button {
+            margin-left: 10px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            background-color: var(--tanjiro-black);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Shippori Mincho', serif;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 2px 2px 0px var(--tanjiro-green);
+        }
+
+        #send-button:active {
+            transform: scale(0.95);
+            box-shadow: none;
+        }
+
+        #send-button span {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 2px;
+        }
+
+        /* 水之呼吸載入動畫 Breath of Water Loading */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .water-wave-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wave-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--water-blue);
+            border-radius: 50%;
+            opacity: 0;
+            animation: waterRipple 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .wave-circle:nth-child(2) { animation-delay: 0.5s; border-color: var(--water-light); }
+        .wave-circle:nth-child(3) { animation-delay: 1.0s; border-color: white; }
+
+        @keyframes waterRipple {
+            0% { transform: scale(0.5); opacity: 1; border-width: 8px; }
+            100% { transform: scale(1.5); opacity: 0; border-width: 0px; }
+        }
+
+        .kanji-loading {
+            position: absolute;
+            color: white;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 24px;
+            font-weight: 900;
+            text-shadow: 0 0 10px var(--water-blue);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @media (max-width: 600px) {
+            #main-container {
+                max-width: 100%;
+                border-left: none;
+                border-right: none;
+            }
+            .message-content {
+                font-size: 15px;
+            }
+            .avatar {
+                width: 35px;
+                height: 35px;
+            }
+            .ichimatsu-header {
+                height: 50px;
+            }
+            .header-title-box {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="chat-header">
-        <span>竈門炭治郎／かまどたんじろう</span>
-    </div>
-    <div id="chat-container"></div>
-    <div id="loading-indicator">
-        <div class="breathing-loader">
-            <div class="breathing-dot"></div>
-            <div class="breathing-dot"></div>
-            <div class="breathing-dot"></div>
+    <div class="bg-pattern"></div>
+    
+    <div id="main-container">
+        <!-- 頂部市松紋 -->
+        <div class="ichimatsu-header">
+            <div class="header-title-box">
+                心ノ呼吸・壱ノ型
+            </div>
+        </div>
+
+        <div id="chat-container"></div>
+
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="請訴說您的煩惱..." autocomplete="off">
+            <button id="send-button" onclick="sendMessage()"><span>傳書</span></button>
         </div>
     </div>
-    <div id="input-container">
-        <input type="text" id="user-input" placeholder="輸入你的訊息...">
-        <button id="send-button" onclick="sendMessage()">送出</button>
+
+    <!-- 水之呼吸特效 -->
+    <div id="loading-overlay">
+        <div class="water-wave-container">
+            <div class="wave-circle"></div>
+            <div class="wave-circle"></div>
+            <div class="wave-circle"></div>
+            <div class="kanji-loading">全集中</div>
+        </div>
     </div>
 
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        const inputContainer = document.getElementById('input-container'); // FIX: Define inputContainer
-        const loadingIndicator = document.getElementById('loading-indicator');
+        const inputContainer = document.getElementById('input-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
-        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間又保留鬼滅之刃炭治郎的風格，根據用戶輸入提供具體建議。\n用戶輸入：";
+        
+        // Updated System Prompt to match the aesthetic (though logically it's the same person)
+        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽並使用溫暖、充滿力量的語氣回應。請使用稍微帶有大正時代風格的口吻（但不要太過艱澀難懂），以「全集中・常中」的精神來回應每一位尋求幫助的人。每次回應不超過80字，建立安全信任的對話空間。\n用戶輸入：";
 
         let conversationHistory = [];
 
-        // Load history from local storage on startup
         window.addEventListener('load', () => {
             const savedHistory = localStorage.getItem('dawnguard_history');
             if (savedHistory) {
                 conversationHistory = JSON.parse(savedHistory);
                 renderHistory();
+            } else {
+                // Welcome Message if empty
+                addMessage("您好，我是竈門炭治郎。無論有什麼煩惱，我都願意傾聽。請把這裡當作可以安心休息的地方。", false);
             }
         });
 
@@ -264,7 +435,7 @@ e<!DOCTYPE html>
             
             const today = new Date().toLocaleDateString();
             const dateStr = date.toLocaleDateString();
-            const displayDate = dateStr === today ? '今天' : dateStr;
+            const displayDate = dateStr === today ? '今日' : dateStr;
 
             const span = document.createElement('span');
             span.textContent = displayDate;
@@ -287,9 +458,13 @@ e<!DOCTYPE html>
             contentDiv.textContent = text;
 
             if (!isUser) {
-                const avatar = document.createElement('img');
-                avatar.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-rp_XtpJG4QahXC82iEEUuoq_XDs-Z90fxA&usqp=CAU';
-                avatar.alt = '炭治郎';
+                const avatar = document.createElement('div');
+                avatar.classList.add('avatar');
+                const img = document.createElement('img');
+                img.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-rp_XtpJG4QahXC82iEEUuoq_XDs-Z90fxA&usqp=CAU';
+                img.alt = '炭治郎';
+                avatar.appendChild(img);
+                
                 messageDiv.appendChild(avatar);
                 messageDiv.appendChild(contentDiv);
                 messageDiv.appendChild(timestamp);
@@ -309,13 +484,17 @@ e<!DOCTYPE html>
                 timestamp: now.toISOString()
             };
             
-            conversationHistory.push(msgObj);
-            saveHistory();
+            // Avoid duplicate pushing if we are just rendering initial welcome
+            // But here we want to persist even the welcome message if it's new
+            if (conversationHistory.length === 0 || conversationHistory[conversationHistory.length-1].content !== text) {
+                 conversationHistory.push(msgObj);
+                 saveHistory();
+            }
 
-            // Check if we need a date separator (compare with previous message if exists)
+            // Check date separator
             if (conversationHistory.length === 1) {
                  addDateSeparator(now);
-            } else {
+            } else if (conversationHistory.length > 1) {
                 const prevMsg = conversationHistory[conversationHistory.length - 2];
                 const prevDate = new Date(prevMsg.timestamp).toLocaleDateString();
                 const currDate = now.toLocaleDateString();
@@ -329,12 +508,11 @@ e<!DOCTYPE html>
         }
 
         function showLoading() {
-            loadingIndicator.style.display = 'flex';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            loadingOverlay.style.display = 'flex';
         }
 
         function hideLoading() {
-            loadingIndicator.style.display = 'none';
+            loadingOverlay.style.display = 'none';
         }
 
         async function sendMessage() {
@@ -344,10 +522,9 @@ e<!DOCTYPE html>
             addMessage(message, true);
             userInput.value = '';
             
-            showLoading(); // Show animation
+            showLoading(); 
 
             let fullPrompt = SYSTEM_PROMPT;
-            // Limit history context to last 10 messages to avoid token limits/cost
             const recentHistory = conversationHistory.slice(-10);
             recentHistory.forEach(entry => {
                 fullPrompt += `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}\n`;
@@ -371,7 +548,10 @@ e<!DOCTYPE html>
                     body: JSON.stringify(payload)
                 });
                 
-                hideLoading(); // Hide animation
+                // Add a small artificial delay to let the animation be seen if response is too fast
+                setTimeout(() => {
+                    hideLoading();
+                }, 1000);
 
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
@@ -388,23 +568,15 @@ e<!DOCTYPE html>
             if (e.key === 'Enter') sendMessage();
         });
 
-        // 防止輸入框焦點時縮放
         userInput.addEventListener('focus', () => {
-            document.body.style.overflow = 'hidden'; // 鎖定滾動
+            document.body.style.overflow = 'hidden'; 
             if (inputContainer) {
-                 chatContainer.style.height = `calc(100vh - ${inputContainer.offsetHeight + 60}px)`; // 動態調整
+                 // Adjust for mobile keyboard if needed, though viewport meta helps
             }
         });
         userInput.addEventListener('blur', () => {
-            document.body.style.overflow = 'auto'; // 恢復滾動
-            chatContainer.style.height = 'calc(100vh - 120px)'; // 恢復原始高度
+            document.body.style.overflow = 'auto'; 
         });
     </script>
 </body>
 </html>
-
-
-
-
-
-
