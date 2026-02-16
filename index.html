@@ -325,6 +325,25 @@
             50% { opacity: 1; transform: scale(1.1); }
         }
 
+        /* Typing Indicator */
+        .typing-indicator {
+            padding: 10px 20px;
+            color: var(--tanjiro-green);
+            font-size: 14px;
+            font-style: italic;
+            animation: pulseText 1.5s infinite;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.8;
+            margin-left: 10px;
+        }
+        
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
         /* 底部海浪 Footer Waves */
         .wave-footer {
             position: fixed;
@@ -397,12 +416,6 @@
     <!-- 水之呼吸特效 + 斬擊 -->
     <div id="effects-overlay">
         <div class="slash-line" id="slash-line"></div>
-        <div class="water-wave-container" id="loading-spinner" style="display:none;">
-            <div class="wave-circle"></div>
-            <div class="wave-circle"></div>
-            <div class="wave-circle"></div>
-            <div class="kanji-loading">全集中</div>
-        </div>
     </div>
 
     <script>
@@ -410,14 +423,14 @@
         const userInput = document.getElementById('user-input');
         const inputContainer = document.getElementById('input-container');
         const effectsOverlay = document.getElementById('effects-overlay');
-        const loadingSpinner = document.getElementById('loading-spinner');
         const slashLine = document.getElementById('slash-line');
+        let typingIndicatorElement = null;
         
         // Changed to flash-8b or flash-1.5, verifying correct model name
         // "gemini-1.5-flash" is the correct model ID for Vertex/AI Studio
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
         
-        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽並使用溫暖、充滿力量的語氣回應。請使用稍微帶有大正時代風格的口吻（但不要太過艱澀難懂），以「全集中・常中」的精神來回應每一位尋求幫助的人。每次回應不超過80字，建立安全信任的對話空間。\n用戶輸入：";
+        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽並使用溫暖、充滿力量的語氣回應。請使用稍微帶有大正時代風格的口吻（但不要太過艱澀難懂）。每次回應不超過0字，建立安全信任的對話空間。\n用戶輸入：";
 
         let conversationHistory = [];
 
@@ -565,13 +578,28 @@
             slashLine.style.animation = 'slashAnim 0.4s ease-out forwards';
             
             setTimeout(() => {
-                loadingSpinner.style.display = 'flex';
-            }, 300); // Show spinner after slash
+                effectsOverlay.style.display = 'none'; // Hide overlay after slash
+                showTypingIndicator(); // Show in-chat indicator
+            }, 300); 
+        }
+
+        function showTypingIndicator() {
+            if (typingIndicatorElement) return;
+            
+            typingIndicatorElement = document.createElement('div');
+            typingIndicatorElement.classList.add('typing-indicator');
+            typingIndicatorElement.innerHTML = `
+                <span>炭治郎正在回覆中...</span>
+            `;
+            chatContainer.appendChild(typingIndicatorElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function hideLoading() {
-            effectsOverlay.style.display = 'none';
-            loadingSpinner.style.display = 'none';
+            if (typingIndicatorElement) {
+                typingIndicatorElement.remove();
+                typingIndicatorElement = null;
+            }
         }
 
         async function sendMessage() {
