@@ -168,7 +168,6 @@ e<!DOCTYPE html>
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
-        const API_KEY = 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw'; // test only, and the key is free tier so don't consider the leakage issue
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
         const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間又保留鬼滅之刃炭治郎的風格，根據用戶輸入提供具體建議。\n用戶輸入：";
 
@@ -230,7 +229,7 @@ e<!DOCTYPE html>
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                        'x-goog-api-key': API_KEY
+                        'x-goog-api-key': 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw' // test only, and the key is free tier so don't consider the leakage issue
                     },
                     body: JSON.stringify(payload)
                 });
@@ -260,6 +259,7 @@ e<!DOCTYPE html>
     </script>
 </body>
 </html>
+
 
 
 
