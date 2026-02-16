@@ -14,6 +14,7 @@ e<!DOCTYPE html>
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            background-image: url('https://www.transparenttextures.com/patterns/black-scales.png'); /* 類似鬼滅隊服或鱗片紋理 */
         }
         #chat-header {
             background-color: #00c300;
@@ -153,6 +154,50 @@ e<!DOCTYPE html>
                 font-size: 10px;
             }
         }
+
+        
+        /* Loading Animation - Water Breathing / Tanjiro Pattern */
+        #loading-indicator {
+            display: none;
+            justify-content: flex-start;
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        
+        .breathing-loader {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .breathing-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #00c300; /* Tanjiro Green */
+            border-radius: 50%;
+            animation: water-breath 1.5s infinite ease-in-out;
+        }
+        
+        .breathing-dot:nth-child(1) { animation-delay: 0s; background-color: #202020; /* Black */ }
+        .breathing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .breathing-dot:nth-child(3) { animation-delay: 0.4s; background-color: #202020; }
+        
+        @keyframes water-breath {
+            0%, 100% { transform: scale(0.5); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .date-separator {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin: 15px 0;
+            position: relative;
+        }
+        .date-separator span {
+            background-color: #f0f0f0;
+            padding: 0 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +205,13 @@ e<!DOCTYPE html>
         <span>竈門炭治郎／かまどたんじろう</span>
     </div>
     <div id="chat-container"></div>
+    <div id="loading-indicator">
+        <div class="breathing-loader">
+            <div class="breathing-dot"></div>
+            <div class="breathing-dot"></div>
+            <div class="breathing-dot"></div>
+        </div>
+    </div>
     <div id="input-container">
         <input type="text" id="user-input" placeholder="輸入你的訊息...">
         <button id="send-button" onclick="sendMessage()">送出</button>
@@ -168,19 +220,67 @@ e<!DOCTYPE html>
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
+        const inputContainer = document.getElementById('input-container'); // FIX: Define inputContainer
+        const loadingIndicator = document.getElementById('loading-indicator');
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
         const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽、溫暖回應、積極引導，每次回應不超過50字，建立安全信任的對話空間又保留鬼滅之刃炭治郎的風格，根據用戶輸入提供具體建議。\n用戶輸入：";
 
         let conversationHistory = [];
 
-        function addMessage(text, isUser) {
+        // Load history from local storage on startup
+        window.addEventListener('load', () => {
+            const savedHistory = localStorage.getItem('dawnguard_history');
+            if (savedHistory) {
+                conversationHistory = JSON.parse(savedHistory);
+                renderHistory();
+            }
+        });
+
+        function saveHistory() {
+            localStorage.setItem('dawnguard_history', JSON.stringify(conversationHistory));
+        }
+
+        function renderHistory() {
+            chatContainer.innerHTML = '';
+            let lastDate = null;
+
+            conversationHistory.forEach(msg => {
+                const msgDate = new Date(msg.timestamp);
+                const dateStr = msgDate.toLocaleDateString();
+
+                if (dateStr !== lastDate) {
+                    addDateSeparator(msgDate);
+                    lastDate = dateStr;
+                }
+
+                renderMessageElement(msg.content, msg.role === 'user', msg.timestamp);
+            });
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addDateSeparator(date) {
+            const separator = document.createElement('div');
+            separator.classList.add('date-separator');
+            
+            const today = new Date().toLocaleDateString();
+            const dateStr = date.toLocaleDateString();
+            const displayDate = dateStr === today ? '今天' : dateStr;
+
+            const span = document.createElement('span');
+            span.textContent = displayDate;
+            separator.appendChild(span);
+            chatContainer.appendChild(separator);
+        }
+
+        function renderMessageElement(text, isUser, timestampStr) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.classList.add(isUser ? 'user' : 'ai');
 
             const timestamp = document.createElement('span');
             timestamp.classList.add('timestamp');
-            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const timeObj = new Date(timestampStr);
+            timestamp.textContent = timeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const contentDiv = document.createElement('div');
             contentDiv.classList.add('message-content');
@@ -199,9 +299,42 @@ e<!DOCTYPE html>
             }
 
             chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-            conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
+        function addMessage(text, isUser) {
+            const now = new Date();
+            const msgObj = {
+                role: isUser ? 'user' : 'assistant',
+                content: text,
+                timestamp: now.toISOString()
+            };
+            
+            conversationHistory.push(msgObj);
+            saveHistory();
+
+            // Check if we need a date separator (compare with previous message if exists)
+            if (conversationHistory.length === 1) {
+                 addDateSeparator(now);
+            } else {
+                const prevMsg = conversationHistory[conversationHistory.length - 2];
+                const prevDate = new Date(prevMsg.timestamp).toLocaleDateString();
+                const currDate = now.toLocaleDateString();
+                if (prevDate !== currDate) {
+                    addDateSeparator(now);
+                }
+            }
+
+            renderMessageElement(text, isUser, now.toISOString());
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showLoading() {
+            loadingIndicator.style.display = 'flex';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideLoading() {
+            loadingIndicator.style.display = 'none';
         }
 
         async function sendMessage() {
@@ -210,9 +343,13 @@ e<!DOCTYPE html>
 
             addMessage(message, true);
             userInput.value = '';
+            
+            showLoading(); // Show animation
 
             let fullPrompt = SYSTEM_PROMPT;
-            conversationHistory.forEach(entry => {
+            // Limit history context to last 10 messages to avoid token limits/cost
+            const recentHistory = conversationHistory.slice(-10);
+            recentHistory.forEach(entry => {
                 fullPrompt += `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}\n`;
             });
             fullPrompt += `Latest User Input: ${message}\nAssistant:`;
@@ -229,15 +366,19 @@ e<!DOCTYPE html>
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-goog-api-key': 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw' // test only, and the key is free tier so don't consider the leakage issue
+                        'x-goog-api-key': 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw'
                     },
                     body: JSON.stringify(payload)
                 });
+                
+                hideLoading(); // Hide animation
+
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 const aiResponse = data.candidates[0].content.parts[0].text;
                 addMessage(aiResponse, false);
             } catch (error) {
+                hideLoading();
                 addMessage("抱歉，發生錯誤，請稍後再試。", false);
                 console.error("Error:", error);
             }
@@ -250,7 +391,9 @@ e<!DOCTYPE html>
         // 防止輸入框焦點時縮放
         userInput.addEventListener('focus', () => {
             document.body.style.overflow = 'hidden'; // 鎖定滾動
-            chatContainer.style.height = `calc(100vh - ${inputContainer.offsetHeight + 60}px)`; // 動態調整
+            if (inputContainer) {
+                 chatContainer.style.height = `calc(100vh - ${inputContainer.offsetHeight + 60}px)`; // 動態調整
+            }
         });
         userInput.addEventListener('blur', () => {
             document.body.style.overflow = 'auto'; // 恢復滾動
