@@ -228,7 +228,7 @@ e<!DOCTYPE html>
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                         'x-goog-api-key': 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw' // test only, and the key is free tier so don't consider the leakage issue
                     },
                     body: JSON.stringify(payload)
@@ -259,6 +259,7 @@ e<!DOCTYPE html>
     </script>
 </body>
 </html>
+
 
 
 
