@@ -44,8 +44,8 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -2;
-            opacity: 0.05;
+            z-index: -1; /* Higher than hero-bg, lower than content */
+            opacity: 0.1; /* Increased opacity slightly to mix with image */
             background-image: 
                 linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
                 linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
@@ -55,6 +55,25 @@
                 linear-gradient(60deg, #77777777 25%, transparent 25.5%, transparent 75%, #77777777 75%, #77777777);
             background-size: 80px 140px;
             background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+            mix-blend-mode: overlay;
+        }
+
+        /* Hero Background Image */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -3; /* Most bottom layer */
+            background-image: url('assets/titan_slayer_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4; /* Fade it out so text is readable */
+            filter: grayscale(40%) sepia(20%) blur(2px) contrast(1.1);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
         }
 
         /* 櫻花/紫藤花飄落效果 */
@@ -88,7 +107,8 @@
             width: 100%;
             max-width: 600px;
             height: 100%;
-            background-color: var(--paper-bg);
+            background-color: rgba(243, 240, 230, 0.85); /* Increased Transparency to see bg */
+            backdrop-filter: blur(5px); /* Glass effect */
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
@@ -387,6 +407,7 @@
     </style>
 </head>
 <body>
+    <div class="hero-background"></div>
     <div class="bg-pattern"></div>
     <div id="petal-container"></div>
     
@@ -630,7 +651,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-goog-api-key': 'AIzaSyCsdB8rfkm313SDuYp4U1EIkdpL1V8hUUw'
+                        'x-goog-api-key': 'AIzaSyCBCbeUgzUEchgTq0lHY06BDpCdn_fHboY'
                     },
                     body: JSON.stringify(payload)
                 });
