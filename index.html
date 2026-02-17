@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dawn Keeper of the Mind - 竈門炭治郎</title>
+    <link rel="icon" href="assets/tanjiro_favicon.png" type="image/png">
+    <link rel="shortcut icon" href="assets/tanjiro_favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Shippori+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tanjiro-green: #207244;
+            --tanjiro-black: #0f1110;
+            --water-blue: #00a8cc;
+            --water-dark: #005a70;
+            --water-light: #8cb6d6;
+            --paper-bg: #f3f0e6;
+            --text-color: #2c2c2c;
+            --accent-red: #b22222;
+            --wisteria-purple: #9b72aa;
+        }
+
+        body {
+            font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+            background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scroll, handle in main container */
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* 背景紋理 Asanoha (麻葉紋) Overlay */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1; /* Higher than hero-bg, lower than content */
+            opacity: 0.1; /* Increased opacity slightly to mix with image */
+            background-image: 
+                linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff),
+                linear-gradient(60deg, #77777777 25%, transparent 25.5%, transparent 75%, #77777777 75%, #77777777),
+                linear-gradient(60deg, #77777777 25%, transparent 25.5%, transparent 75%, #77777777 75%, #77777777);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+            mix-blend-mode: overlay;
+        }
+
+        /* Hero Background Image */
+        .hero-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -3; /* Most bottom layer */
+            background-image: url('assets/titan_slayer_bg.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4; /* Fade it out so text is readable */
+            filter: grayscale(40%) sepia(20%) blur(2px) contrast(1.1);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 櫻花/紫藤花飄落效果 */
+        #petal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .petal {
+            position: absolute;
+            background-color: var(--wisteria-purple);
+            border-radius: 150% 0 150% 0;
+            opacity: 0.8;
+            animation: falling linear infinite;
+        }
+
+        @keyframes falling {
+            0% { transform: translate(0, -10px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translate(100px, 100vh) rotate(360deg); opacity: 0; }
+        }
+
+        #main-container {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            background-color: rgba(243, 240, 230, 0.85); /* Increased Transparency to see bg */
+            backdrop-filter: blur(5px); /* Glass effect */
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            border-left: 10px solid var(--tanjiro-black);
+            border-right: 10px solid var(--tanjiro-black);
+            position: relative;
+            z-index: 10;
+        }
+
+        .ichimatsu-header {
+            height: 60px;
+            width: 100%;
+            background-color: var(--tanjiro-green);
+            background-image: 
+                linear-gradient(45deg, var(--tanjiro-black) 25%, transparent 25%, transparent 75%, var(--tanjiro-black) 75%, var(--tanjiro-black)),
+                linear-gradient(45deg, var(--tanjiro-black) 25%, transparent 25%, transparent 75%, var(--tanjiro-black) 75%, var(--tanjiro-black));
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+            position: relative;
+        }
+
+        .header-title-box {
+            background-color: var(--paper-bg);
+            padding: 5px 20px;
+            border: 2px solid var(--tanjiro-black);
+            font-weight: 900;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        #chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px; /* Space for waves */
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        #chat-container::-webkit-scrollbar { width: 8px; }
+        #chat-container::-webkit-scrollbar-track { background: #e0dccc; }
+        #chat-container::-webkit-scrollbar-thumb { background: var(--tanjiro-black); border-radius: 4px; }
+
+        .message {
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.ai { align-self: flex-start; }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--tanjiro-black);
+            overflow: hidden;
+            margin: 0 10px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            background-color: white;
+            flex-shrink: 0;
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user .avatar { display: none; }
+
+        .message-content {
+            padding: 12px 18px;
+            font-size: 16px;
+            line-height: 1.6;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .message.ai .message-content {
+            background-color: white;
+            border-radius: 4px 20px 20px 20px;
+            border-left: 4px solid var(--tanjiro-green);
+        }
+
+        .message.user .message-content {
+            background-color: var(--tanjiro-black);
+            color: #f0f0f0;
+            border-radius: 20px 4px 20px 20px;
+            border-right: 4px solid var(--water-blue);
+        }
+
+        .timestamp { font-size: 10px; color: #888; margin: 0 5px; margin-bottom: 5px; }
+
+        .date-separator {
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            margin: 20px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .date-separator::before, .date-separator::after {
+            content: ''; flex: 1; height: 1px; background-color: #ccc; margin: 0 15px;
+        }
+        .date-separator span {
+            background-color: rgba(255,255,255,0.7);
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-family: 'Shippori Mincho', serif;
+            letter-spacing: 1px;
+        }
+
+        #input-container {
+            padding: 15px;
+            background-color: #f8f6f0;
+            border-top: 2px solid var(--tanjiro-black);
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            font-family: 'Noto Serif JP', serif;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        #user-input:focus { border-color: var(--tanjiro-green); }
+
+        #send-button {
+            margin-left: 10px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            background-color: var(--tanjiro-black);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Shippori Mincho', serif;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 2px 2px 0px var(--tanjiro-green);
+        }
+        #send-button:active { transform: scale(0.95); box-shadow: none; }
+        #send-button span { writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; }
+
+        /* 水之呼吸載入 + 斬擊特效 */
+        #effects-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none; /* JS toggles flex */
+            justify-content: center; align-items: center;
+        }
+
+        /* 斬擊效果 */
+        .slash-line {
+            position: absolute;
+            width: 0%;
+            height: 4px;
+            background: white;
+            box-shadow: 0 0 10px var(--water-blue), 0 0 20px var(--water-light);
+            transform: rotate(-15deg);
+            opacity: 0;
+            transform-origin: left;
+        }
+        
+        @keyframes slashAnim {
+            0% { width: 0%; opacity: 0; left: 10%; }
+            10% { opacity: 1; }
+            50% { width: 120%; opacity: 1; left: -10%; }
+            100% { width: 120%; opacity: 0; left: -10%; }
+        }
+
+        .water-wave-container {
+            position: relative;
+            width: 150px; height: 150px;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            pointer-events: auto; /* Allow blocking clicks while loading */
+        }
+
+        .wave-circle {
+            position: absolute; width: 100%; height: 100%;
+            border: 4px solid var(--water-blue); border-radius: 50%;
+            opacity: 0;
+            animation: waterRipple 2s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .wave-circle:nth-child(2) { animation-delay: 0.5s; border-color: var(--water-light); }
+        .wave-circle:nth-child(3) { animation-delay: 1.0s; border-color: white; }
+
+        @keyframes waterRipple {
+            0% { transform: scale(0.5); opacity: 1; border-width: 8px; }
+            100% { transform: scale(1.5); opacity: 0; border-width: 0px; }
+        }
+
+        .kanji-loading {
+            position: absolute; color: white;
+            font-family: 'Shippori Mincho', serif;
+            font-size: 24px; font-weight: 900;
+            text-shadow: 0 0 10px var(--water-blue);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            padding: 10px 20px;
+            color: var(--tanjiro-green);
+            font-size: 14px;
+            font-style: italic;
+            animation: pulseText 1.5s infinite;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.8;
+            margin-left: 10px;
+        }
+        
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* 底部海浪 Footer Waves */
+        .wave-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            pointer-events: none;
+            z-index: 50; /* Behind input, in front of bg */
+            overflow: hidden;
+            display: none; /* Hidden on mobile/small screens if too cluttered, but let's keep it subtle */
+        }
+        
+        .wave-svg {
+            position: absolute;
+            bottom: 0;
+            width: 200%;
+            height: 100%;
+            animation: waveMove 10s linear infinite;
+            fill: var(--water-dark);
+            opacity: 0.2;
+        }
+
+        .wave-svg:nth-child(2) {
+            bottom: 5px;
+            opacity: 0.3;
+            fill: var(--water-blue);
+            animation: waveMove 8s linear infinite reverse;
+        }
+
+        @keyframes waveMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @media (max-width: 600px) {
+            #main-container { max-width: 100%; border: none; }
+            .message-content { font-size: 15px; }
+            .ichimatsu-header { height: 50px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-background"></div>
+    <div class="bg-pattern"></div>
+    <div id="petal-container"></div>
+    
+    <div class="wave-footer">
+        <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+        <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+             <path d="M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,170.7C672,149,768,139,864,160C960,181,1056,235,1152,240C1248,245,1344,203,1392,181.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+    </div>
+
+    <div id="main-container">
+        <!-- 頂部市松紋 -->
+        <div class="ichimatsu-header">
+            <div class="header-title-box">心ノ呼吸・壱ノ型</div>
+        </div>
+
+        <div id="chat-container"></div>
+
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="請訴說您的煩惱..." autocomplete="off">
+            <button id="send-button" onclick="sendMessage()"><span>傳書</span></button>
+        </div>
+    </div>
+
+    <!-- 水之呼吸特效 + 斬擊 -->
+    <div id="effects-overlay">
+        <div class="slash-line" id="slash-line"></div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const inputContainer = document.getElementById('input-container');
+        const effectsOverlay = document.getElementById('effects-overlay');
+        const slashLine = document.getElementById('slash-line');
+        let typingIndicatorElement = null;
+        
+        // Changed to flash-8b or flash-1.5, verifying correct model name
+        // "gemini-1.5-flash" is the correct model ID for Vertex/AI Studio
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+        
+        const SYSTEM_PROMPT = "系統提示：你是一位極具同理心的鬼滅之刃炭治郎心理諮商師，耐心傾聽並使用溫暖、充滿力量的語氣回應。請使用稍微帶有大正時代風格的口吻（但不要太過艱澀難懂）。每次回應不超過0字，建立安全信任的對話空間。\n用戶輸入：";
+
+        let conversationHistory = [];
+
+        window.addEventListener('load', () => {
+            initPetals();
+            const savedHistory = localStorage.getItem('dawnguard_history');
+            if (savedHistory) {
+                conversationHistory = JSON.parse(savedHistory);
+                renderHistory();
+            } else {
+                addMessage("您好，我是竈門炭治郎。無論有什麼煩惱，我都願意傾聽。請把這裡當作可以安心休息的地方。", false);
+            }
+        });
+
+        // Initialize falling petals
+        function initPetals() {
+            const container = document.getElementById('petal-container');
+            const petalCount = 15;
+            for (let i = 0; i < petalCount; i++) {
+                createPetal(container);
+            }
+        }
+
+        function createPetal(container) {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            
+            // Randomize properties
+            const left = Math.random() * 100;
+            const size = Math.random() * 10 + 5;
+            const duration = Math.random() * 5 + 5;
+            const delay = Math.random() * 5;
+            const color = Math.random() > 0.5 ? '#9b72aa' : '#ffc0cb'; // Wisteria or Sakura
+
+            petal.style.left = `${left}%`;
+            petal.style.width = `${size}px`;
+            petal.style.height = `${size}px`;
+            petal.style.animationDuration = `${duration}s`;
+            petal.style.animationDelay = `${delay}s`;
+            petal.style.backgroundColor = color;
+
+            container.appendChild(petal);
+        }
+
+        function saveHistory() {
+            localStorage.setItem('dawnguard_history', JSON.stringify(conversationHistory));
+        }
+
+        function renderHistory() {
+            chatContainer.innerHTML = '';
+            let lastDate = null;
+
+            conversationHistory.forEach(msg => {
+                const msgDate = new Date(msg.timestamp);
+                const dateStr = msgDate.toLocaleDateString();
+
+                if (dateStr !== lastDate) {
+                    addDateSeparator(msgDate);
+                    lastDate = dateStr;
+                }
+
+                renderMessageElement(msg.content, msg.role === 'user', msg.timestamp);
+            });
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addDateSeparator(date) {
+            const separator = document.createElement('div');
+            separator.classList.add('date-separator');
+            const today = new Date().toLocaleDateString();
+            const dateStr = date.toLocaleDateString();
+            const displayDate = dateStr === today ? '今日' : dateStr;
+            const span = document.createElement('span');
+            span.textContent = displayDate;
+            separator.appendChild(span);
+            chatContainer.appendChild(separator);
+        }
+
+        function renderMessageElement(text, isUser, timestampStr) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user' : 'ai');
+
+            const timestamp = document.createElement('span');
+            timestamp.classList.add('timestamp');
+            const timeObj = new Date(timestampStr);
+            timestamp.textContent = timeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('message-content');
+            contentDiv.textContent = text;
+
+            if (!isUser) {
+                const avatar = document.createElement('div');
+                avatar.classList.add('avatar');
+                const img = document.createElement('img');
+                img.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-rp_XtpJG4QahXC82iEEUuoq_XDs-Z90fxA&usqp=CAU';
+                img.alt = '炭治郎';
+                avatar.appendChild(img);
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(timestamp);
+            } else {
+                messageDiv.appendChild(timestamp);
+                messageDiv.appendChild(contentDiv);
+            }
+
+            chatContainer.appendChild(messageDiv);
+        }
+
+        function addMessage(text, isUser) {
+            const now = new Date();
+            const msgObj = {
+                role: isUser ? 'user' : 'assistant',
+                content: text,
+                timestamp: now.toISOString()
+            };
+            
+            if (conversationHistory.length === 0 || conversationHistory[conversationHistory.length-1].content !== text) {
+                 conversationHistory.push(msgObj);
+                 saveHistory();
+            }
+
+            if (conversationHistory.length === 1) {
+                 addDateSeparator(now);
+            } else if (conversationHistory.length > 1) {
+                const prevMsg = conversationHistory[conversationHistory.length - 2];
+                const prevDate = new Date(prevMsg.timestamp).toLocaleDateString();
+                const currDate = now.toLocaleDateString();
+                if (prevDate !== currDate) {
+                    addDateSeparator(now);
+                }
+            }
+
+            renderMessageElement(text, isUser, now.toISOString());
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showSlashEffect() {
+            effectsOverlay.style.display = 'flex';
+            slashLine.style.animation = 'none';
+            // Trigger reflow
+            void slashLine.offsetWidth;
+            slashLine.style.animation = 'slashAnim 0.4s ease-out forwards';
+            
+            setTimeout(() => {
+                effectsOverlay.style.display = 'none'; // Hide overlay after slash
+                showTypingIndicator(); // Show in-chat indicator
+            }, 300); 
+        }
+
+        function showTypingIndicator() {
+            if (typingIndicatorElement) return;
+            
+            typingIndicatorElement = document.createElement('div');
+            typingIndicatorElement.classList.add('typing-indicator');
+            typingIndicatorElement.innerHTML = `
+                <span>炭治郎正在回覆中...</span>
+            `;
+            chatContainer.appendChild(typingIndicatorElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideLoading() {
+            if (typingIndicatorElement) {
+                typingIndicatorElement.remove();
+                typingIndicatorElement = null;
+            }
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            userInput.value = '';
+            
+            showSlashEffect();
+
+            let fullPrompt = SYSTEM_PROMPT;
+            const recentHistory = conversationHistory.slice(-10);
+            recentHistory.forEach(entry => {
+                fullPrompt += `${entry.role === "user" ? "User" : "Assistant"}: ${entry.content}\n`;
+            });
+            fullPrompt += `Latest User Input: ${message}\nAssistant:`;
+
+            const payload = {
+                "contents": [{
+                    "parts": [{
+                        "text": fullPrompt
+                    }]
+                }]
+            };
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': 'AIzaSyCS81HiHdOFsvTRtkHYbHbfiRjQCn39Qrs'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                // Keep the spinner visible for at least a moment to show the effect
+                // With flash model it might be too fast, so 800ms delay is nice
+                setTimeout(async () => {
+                    hideLoading();
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    addMessage(aiResponse, false);
+                }, 800);
+
+            } catch (error) {
+                hideLoading();
+                addMessage("抱歉，發生錯誤，請稍後再試。", false);
+                console.error("Error:", error);
+            }
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        userInput.addEventListener('focus', () => {
+            document.body.style.overflow = 'hidden'; 
+        });
+        userInput.addEventListener('blur', () => {
+            document.body.style.overflow = 'auto'; 
+        });
+    </script>
+</body>
+</html>
